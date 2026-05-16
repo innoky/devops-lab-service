@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -f docker/Dockerfile \
+            -t devops-lab-service:${{ github.sha }} \
+            .
+
+      - name: Run container
+        run: |
+          docker run -d \
+            --name devops-lab \
+            -p 8000:8000 \
+            devops-lab-service:${{ github.sha }}
+
+      - name: Wait for service to start
+        run: sleep 5
+
+      - name: Check service is responding
+        run: |
+          curl --fail http://localhost:8000/
+          curl --fail http://localhost:8000/tasks
+
+      - name: Show container logs
+        if: failure()
+        run: docker logs devops-lab
