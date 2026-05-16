@@ -1,1 +1,29 @@
-# TODO: реализовать
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: devops-lab-service:latest
+    container_name: devops-lab
+    ports:
+      - "8000:8000"
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    depends_on:
+      - app
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
