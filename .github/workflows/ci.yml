@@ -54,4 +54,4 @@ jobs:
           script: |
             cd ${{ secrets.PROJECT_PATH }}
             git pull
-            docker-compose up -d --build
+            docker-compose -f docker/docker-compose.yml up -d --build
